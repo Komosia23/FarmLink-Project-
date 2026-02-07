@@ -1,0 +1,33 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, AuthContext } from "./context/AuthContext";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Home from "./pages/Home";
+import FarmerDashboard from "./pages/FarmerDashboard";
+import BuyerDashboard from "./pages/BuyerDashboard";
+import ChatPage from "./pages/ChatPage";
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/farmer" element={<ProtectedRoute role="farmer"><FarmerDashboard /></ProtectedRoute>} />
+          <Route path="/buyer" element={<ProtectedRoute role="buyer"><BuyerDashboard /></ProtectedRoute>} />
+          <Route path="/chat/:userId" element={<ChatPage />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
+}
+
+const ProtectedRoute = ({ role, children }) => {
+  const { user } = AuthContext._currentValue;
+  if(!user || (role && user.role!==role)) return <Navigate to="/login" />;
+  return children;
+};
+
+export default App;
